@@ -1,5 +1,6 @@
 import Widget from './Widget'
 import { IAPI, ICustomTrack } from './API'
+import Info from './info'
 
 
 
@@ -64,7 +65,7 @@ export default async function Home( { searchParams }: IPageProps ) {
     let error = null
     const { p, imgs: imgs_string, color } = searchParams
     const playlist_path = p
-    if (!playlist_path) { return <p className='p-2'>Insert the playlist URL param!</p> }
+    if (!playlist_path) { return <Info /> }
 
     const page: IAPI = await fetch("https://soundcloud.com/" + playlist_path, {
         next: {
