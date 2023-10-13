@@ -18,7 +18,7 @@ const PARAMS = process.env.PARAMS
 const API_KEY = process.env.API_KEY
 
 
-export async function getTracks(ids: string) { 
+async function getTracks(ids: string) { 
     if (!ids) { return {error: 'Insert Valid Params!'} }
     if (!API_TRACK_URL || !PARAMS) { return {error: 'Server Error: Ambient Variables Missing'} }
 
