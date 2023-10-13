@@ -1,5 +1,5 @@
 "use client"
-import { IAPI } from "./IAPI"
+import { IAPI } from "./API"
 import AudioPlayer from "./AudioPlayer"
 import { useEffect, useState } from "react"
 

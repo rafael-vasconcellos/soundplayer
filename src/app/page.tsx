@@ -1,5 +1,5 @@
 import Widget from './Widget'
-import { IAPI, ICustomTrack } from './IAPI'
+import { IAPI, ICustomTrack } from './API'
 
 
 

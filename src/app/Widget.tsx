@@ -1,5 +1,5 @@
 import Player from "./Player"
-import { IAPI } from "./IAPI"
+import { IAPI } from "./API"
 import './style.css'
 import Image from 'next/image'
 import soundcloud from '../../public/soundcloud.svg'

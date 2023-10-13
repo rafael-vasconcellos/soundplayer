@@ -2,7 +2,7 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import Hls from "hls.js";
 import { useHls, changePortrait, hydrateControls } from "./utils";
-import { ICustomTrack } from "./IAPI";
+import { ICustomTrack } from "./API";
 import { IPlayerProps } from "./Player";
 
 

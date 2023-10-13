@@ -2,7 +2,7 @@
 
 .env
 src/.env
-src/app/IAPI.ts
+src/app/private.ts
 
 
 # dependencies

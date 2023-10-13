@@ -1,7 +1,7 @@
 import React, { RefObject } from 'react';
 import Hls from 'hls.js';
 import { audioHls } from './AudioPlayer';
-import { ICustomTrack } from './IAPI';
+import { ICustomTrack } from './API';
 
 
 export interface IUseHls { 
