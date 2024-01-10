@@ -24,7 +24,12 @@ async function getTracks(ids: string) {
     if (!API_TRACK_URL || !PARAMS) { return {error: 'Server Error: Ambient Variables Missing'} }
 
     return await fetch(API_TRACK_URL + ids + `&${PARAMS}`, { 
-        headers: { "Authorization": API_KEY ?? '' }
+        headers: { 
+            "Authorization": API_KEY ?? '',
+            "Cache-Control": "public, max-age=3600, must-revalidate"
+            // no-cache vs no-store
+        },
+        //next: { revalidate: 60*2 }
     } ).then(response => response.json())
 
 }
