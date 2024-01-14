@@ -14,7 +14,7 @@ interface IPageProps {
 }
 
 
-const PARAMS = process.env.PARAMS
+const API_QUERY_PARAMS = process.env.API_QUERY_PARAMS
 const API_KEY = process.env.API_KEY
 const API_TRACK_URL = process.env.API_TRACK_URL
 let error: any = null
@@ -23,7 +23,7 @@ let error: any = null
 async function getTracks(ids: string) { 
     if (!ids) { error = "error: 'Insert Valid Params!'" }
   
-    return await fetch(API_TRACK_URL + ids + `&${PARAMS}`, { 
+    return await fetch(API_TRACK_URL + ids + `&${API_QUERY_PARAMS}`, { 
         headers: { 
             "Authorization": API_KEY ?? '',
             //"Cache-Control": "public, max-age=3600, must-revalidate"
@@ -76,7 +76,7 @@ function get_object(html: string) {
 export default async function Home( { searchParams }: IPageProps ) { 
     const { p: playlist_path, imgs: imgs_string, color } = searchParams
     if (!playlist_path) { return <Info /> }
-    if (!API_TRACK_URL || (!PARAMS && !API_KEY)) { error = "Server Error: Ambient Variables Missing" }
+    if (!API_TRACK_URL || (!API_QUERY_PARAMS && !API_KEY)) { error = "Server Error: Ambient Variables Missing" }
 
     const page: IAPI = await fetch("https://soundcloud.com/" + playlist_path, { 
         headers: { 

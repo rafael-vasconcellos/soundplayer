@@ -20,8 +20,8 @@ export default function Info() {
             <p>The API route <i>api/track/id/?q=song_url</i> returns the song's id</p>
             <p>Song URL Example: roadrunner-usa/nickelback-far-away</p>
 
-            <h1 className="font-bold text-xl">Enviroment Variables</h1>
-            <p>three ones are required. the URL path for one of the soundcloud API calls, the parameters that will be used on each call and the API KEY.</p>
+            <h1 className="font-bold text-xl">Environment Variables</h1>
+            <p>there are three ones. the URL path for one of the API calls, the one that returns the tracks from specified ids, the parameters that will be used on each API call and the API KEY.</p>
         </main>
     )
 }
