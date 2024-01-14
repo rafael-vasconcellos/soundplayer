@@ -81,8 +81,9 @@ export default async function Home( { searchParams }: IPageProps ) {
     const page: IAPI = await fetch("https://soundcloud.com/" + playlist_path, { 
         headers: { 
             "Authorization": API_KEY ?? '',
+            "Cache-Control": 'no-cache'
             //"Cache-Control": "public, max-age=3600, must-revalidate"
-            // no-cache vs no-store
+            // no-cache vs no-store (SSR)
         },
         //next: { revalidate: 60*2 }
     } ).then( response => response.text() ).then( html => get_object(html) ).then(str => { 
