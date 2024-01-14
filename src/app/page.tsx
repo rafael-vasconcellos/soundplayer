@@ -101,7 +101,7 @@ export default async function Home( { searchParams }: IPageProps ) {
     const ids = remnants?.map(e => e.id).join(',') // ou %2C
 
     const requests = await getTracks(ids)
-    remnants?.forEach( indice => { if (requests.length) {
+    remnants?.forEach( indice => { if (requests?.length) {
         tracks[indice.index] = requests?.find((e: ICustomTrack) => indice.id === e.id)
     } } )
 
@@ -118,8 +118,8 @@ export default async function Home( { searchParams }: IPageProps ) {
 
     return (
         <>
-            {error && <main>{error}</main>}
-            {page && <Widget api={ page } color={color}/>}
+            {error && <p>{error}</p>}
+            {page && !error && <Widget api={ page } color={color}/>}
         </>
     )
 }
