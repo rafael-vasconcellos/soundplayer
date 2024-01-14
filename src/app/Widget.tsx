@@ -8,8 +8,8 @@ import soundcloud from '../../public/soundcloud.svg'
 
 const Widget: React.FC<{api: IAPI, color: string | undefined}> = function( {api, color} ) { 
     const track = api?.data?.tracks[0]
-    const albumArtwork = api.data.artwork_url ?? api.data.tracks[0].artwork_url
-    const artwork = api.data.updated_artwork ?? albumArtwork.replace("large", 't500x500')
+    const albumArtwork = api?.data?.artwork_url ?? api?.data?.tracks[0]?.artwork_url
+    const artwork = api?.data?.updated_artwork ?? albumArtwork?.replace("large", 't500x500')
     
 
     return (
@@ -23,14 +23,14 @@ const Widget: React.FC<{api: IAPI, color: string | undefined}> = function( {api,
             className='bg-zinc-400 object-fill object-center' style={ {minWidth: '125px'} } />
 
             <div className="flex flex-col items-center h-full w-4/5 relative">
-                <a className="font-bold" id="title" href={track.permalink_url} target="_blank">{track?.title?.slice(0, 24) + '...'}</a>
+                <a className="font-bold" id="title" href={track?.permalink_url} target="_blank">{track?.title?.slice(0, 24) + '...'}</a>
                 <Player api={api} />
                 <p className="text-xs absolute bottom-0 w-full">
-                    <a href={api.data.permalink_url} target="_blank">
+                    <a href={api?.data?.permalink_url} target="_blank">
                         { (api?.data?.title&&api?.data?.user?.username)?
                             api?.data?.title+' by '+api?.data?.user?.username : '' }
                     </a>
-                    <span className="px-2">{'1 / '+api.data.tracks.length}</span>
+                    <span className="px-2">{'1 / '+api?.data?.tracks?.length}</span>
                 </p>
             </div>
 

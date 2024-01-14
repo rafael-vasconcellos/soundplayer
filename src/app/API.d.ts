@@ -1,5 +1,5 @@
 type IAPIObject = {
-    hydratable: string;
+    hydratable?: string;
     data: {
         artwork_url: string;
         created_at: string;
