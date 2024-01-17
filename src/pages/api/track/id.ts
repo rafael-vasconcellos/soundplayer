@@ -11,7 +11,8 @@ export default async function get_id(request: NextApiRequest, response: NextApiR
 
     const page = new JSDOM(html).window.document
     const meta: any = page.querySelector('meta[property="twitter:app:url:iphone"]');
-    if (meta) {
+    if (meta) { 
+        response.setHeader('Cache-Control', 'public, max-age=3600')
         response.send( {id: meta?.content?.split('//')[1]} )
     } else {
         response.send( {error: 'Not found!'} )
