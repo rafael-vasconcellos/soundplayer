@@ -10,7 +10,6 @@ export interface IUseHls {
     check(): void
 
     audioRef: RefObject<HTMLAudioElement>
-    _hls?: Hls
     track?: ICustomTrack
     streamUrl?: string
     fetch(track: ITrack): Promise<string | undefined>
