@@ -1,5 +1,5 @@
 import Widget from './Widget'
-import Info from './info'
+import Info from './components/info'
 import { IAPI, ICustomTrack } from './API'
 
 
@@ -8,6 +8,7 @@ import { IAPI, ICustomTrack } from './API'
 interface IPageProps {
     searchParams: {
         p: string
+        s?: string
         imgs?: string
         color?: string
     }
@@ -24,7 +25,12 @@ const headers = {
     // no-cache vs no-store
 }
 
-let error: any = null
+const hydratables = {
+    playlist: '{"hydratable":"playlist"',
+    sound: '{"hydratable":"sound"'
+}
+
+let error: string | null = null
 
 
 async function getTracks(ids: string) { 
@@ -34,19 +40,22 @@ async function getTracks(ids: string) {
         headers,
         //next: { revalidate: 60*2 }
     } ).then(response => { 
-        if (response.status === 401) { 
+        if (response.status === 200) {
+            return response.json()
+
+        } else if (response.status === 401) { 
             error = "error: Expired token!"
             return null
-        } else if (response.status === 200) {
-            return response.json()
         }
-    } )
-  
+
+    } )  
 }
 
   
-function get_object(html: string) { 
-    const start = html.indexOf('{"hydratable":"playlist"')
+function get_object(html: string, name: keyof typeof hydratables) { 
+
+    if (!html || !name) { throw new Error("Invalid input string!") }
+    const start = html.indexOf(hydratables[name])
     if (start === -1) {return null}
     let end = null
     let count = null
@@ -77,19 +86,30 @@ function get_object(html: string) {
 
 
 export default async function Home( { searchParams }: IPageProps ) { 
-    const { p: playlist_path, imgs: imgs_string, color } = searchParams
+    const { p, s, imgs: imgs_string, color } = searchParams
+    const name = p? "playlist" : "sound"
+    const playlist_path = p ?? s
+
     if (!playlist_path) { return <Info /> }
     if (!API_TRACK_URL || (!API_QUERY_PARAMS && !API_KEY)) { error = "Server Error: Ambient Variables Missing" }
 
     const page: IAPI = await fetch("https://soundcloud.com/" + playlist_path, { 
         headers,
         //next: { revalidate: 60*2 }
-    } ).then( response => response.text() ).then( html => get_object(html) ).then(str => { 
-            if (str) { return JSON.parse(str) } 
+    } ).then( response => response.text() ).then( html => get_object(html, name) ).then(str => { 
+            if (str) { 
+                const response = JSON.parse(str)
+                if (response?.data?.tracks?.length) { return response }
+                else { 
+                    return {
+                        data: { tracks: [response?.data] }
+                    }
+                }
+            } 
             else { throw new Error(`Failed to parse: ${str}`) }
     } )
     .catch(e => {error = e.message})
-
+    console.log(JSON.stringify(page))
 
 
     // no objeto da playlist, as vezes algumas faixas tem um objeto praticamente vazio (remanescentes)
@@ -98,10 +118,12 @@ export default async function Home( { searchParams }: IPageProps ) {
     const remnants = tracks?.filter(e => !e.media).map(e => { return {id: e.id, index: tracks.indexOf(e)} })
     const ids = remnants?.map(e => e.id).join(',') // ou %2C
 
-    const requests = await getTracks(ids)
-    remnants?.forEach( indice => { if (requests?.length) {
-        tracks[indice.index] = requests?.find((e: ICustomTrack) => indice.id === e.id)
-    } } )
+    if (ids) {
+        const requests = await getTracks(ids)
+        remnants?.forEach(remnant => { if (requests?.length) {
+            tracks[remnant.index] = requests?.find( (track: ICustomTrack) => remnant.id === track.id )
+        } } )
+    }
 
 
 
@@ -109,15 +131,15 @@ export default async function Home( { searchParams }: IPageProps ) {
     const imgs = imgs_string?.replaceAll('https://', '')?.split(',') 
     imgs?.forEach(e => { 
         const [ id, ...link ] = e.split(':')
-        const track: ICustomTrack | undefined = tracks?.find(e => e.id === Number(id))
-        if (track) { track.updated_artwork = 'https://' + link[link.length-1] }
-        else if (id.includes('playlist')) { page.data.updated_artwork = link[link.length-1] }
+        const track: ICustomTrack | undefined = tracks?.find(track => track.id === Number(id))
+        if (track) { track.updated_artwork = 'https://' + link.at(-1) }
+        else if (id.includes('playlist')) { page.data.updated_artwork = link.at(-1) }
     } )
 
     return (
         <>
-            {error && <p>{error}</p>}
-            {page && !error && <Widget api={ page } color={color}/>}
+            {error && <p className='p-3'>{error}</p>}
+            { (page?.data?.tracks?.length && !error) && <Widget api={ page } color={color}/> }
         </>
     )
 }

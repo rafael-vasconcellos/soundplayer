@@ -1,8 +1,7 @@
 // https://hlsjs.video-dev.org/api-docs/hls.js
-
 import React, { RefObject } from 'react';
 import Hls, { Events, ErrorData, ErrorController, ErrorDetails } from 'hls.js';
-import { audioHls } from './AudioPlayer';
+import { audioHls } from './components/AudioPlayer';
 import { ICustomTrack } from './API';
 
 
@@ -40,26 +39,30 @@ export function useHls(streamUrl?: string) {
             return audioRef
         },
 
-        fetch(track: ITrack): Promise<string | undefined> { return new Promise( (resolve) => { 
+        async fetch(track: ITrack): Promise<string | undefined> { 
             this.track = track
             if (!track.hls && track.media?.transcodings[0]?.url) { 
-                track.started = true
-                fetch(`/api/track/hls/${track.id}`, { headers: {
-                    "url": track.media?.transcodings[0]?.url
-                } } )
-                .then(response => response.text()).then(url => { 
-                    const hls = this.update(url)
-                    resolve(url)
-                } );
+                    track.started = true
+                    return await fetch(`/api/track/hls/${track.id}`, { headers: { 
+                        "url": track.media?.transcodings[0]?.url
+                    } } )
+                    .then(response => { 
+                        if (response.status===200) { return response.text() }
+
+                    }).then(url => { if (url) { 
+                        const hls = this.update(url)
+                        return url    
+                    } } );
     
+
             } else if (track.hls && this.audioRef.current) { 
                 console.log('alert')
                 track.hls.attachMedia(this.audioRef.current)
-                resolve(this.streamUrl)
+                return this.streamUrl
             }
     
     
-        } ) },
+        },
 
         update(url: string) { 
             this.streamUrl = url

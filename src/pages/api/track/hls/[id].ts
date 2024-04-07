@@ -12,24 +12,29 @@ export default async function getTrackHLS(request: NextApiRequest, response: Nex
     const url = headers?.url
     if (url) { 
 
-        const fileURL = await fetch(url + '?' + API_QUERY_PARAMS, { 
+        const fileURL: string = await fetch(url + '?' + API_QUERY_PARAMS, { 
             next: {
                 revalidate: 30
             },
             headers: { 'Authorization': API_KEY ?? '' }
         } )
-        .then(response => response.json()).then(res => res?.url ?? {})
-        .catch(e => response.send(e))
+        .then(response => { 
+            if (response.status===200) { return response.json() }
 
+        }).then(res => res?.url ?? "")
+        .catch(e => response.status(500).send(e))
+        const status_code = fileURL? 200 : 500
+
+        //console.log(fileURL, status_code)
         response.setHeader('Cache-Control', 'public, max-age=15, must-revalidate')
-        response.send(fileURL)
+        response.status(status_code).send(fileURL)
         /*
         const file = await fetch(fileURL)
         .then(response => response.text()).then(res => response.send(res))
         .catch(e => response.send(e))*/
 
     } else {
-        response.send( {result: 'Error fetching file'} )
+        response.status(400).send( {result: 'URL header missing!'} )
     }
 
 }

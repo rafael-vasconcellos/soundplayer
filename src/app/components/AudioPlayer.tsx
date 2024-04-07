@@ -1,6 +1,6 @@
 "use client"
 import { ChangeEvent, useEffect, useState } from "react";
-import { useHls, changePortrait, hydrateControls, ITrack } from "./utils";
+import { useHls, changePortrait, hydrateControls, ITrack } from "../utils";
 import { IPlayerProps } from "./Player";
 
 
