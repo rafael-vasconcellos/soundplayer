@@ -1,5 +1,5 @@
 import Widget from './Widget'
-import Info from './components/info'
+import Info from './components/Info'
 import { IAPI, ICustomTrack } from './API'
 
 

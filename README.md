@@ -1,4 +1,4 @@
-Player customizável com query parameters para ser incorporado em sites e etc. Construído com NextJS, tailwindcss, jsdom, hls e etc. É possível fornecer a playlist a ser exibida  (por hora, apenas playlists funcionam), customizar a cor do player e as artworks, tanto do álbum, quanto das músicas.
+Player customizável com query parameters para ser incorporado em sites e etc. Construído com NextJS, tailwindcss, jsdom, hls e etc. É possível fornecer a playlist a ser exibida, customizar a cor do player, as artworks, tanto do álbum, quanto das músicas e etc.
 
 Mais instruções sobre como usar os query parameters estão na [rota home](https://soundplayer.vercel.app/)
 
