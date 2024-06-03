@@ -117,11 +117,15 @@ export function changePortrait(track: ICustomTrack, index: number, length: numbe
     const title = track.title
 
     const img = document.querySelector('img') as HTMLImageElement
-    const h1 = document.querySelector('main a#title') as HTMLElement
+    const h1 = document.querySelector('main a#title') as HTMLAnchorElement
     const span = document.querySelector('p > span') as HTMLElement
 
     if (artwork) { img.src = artwork }
-    h1.textContent = title?.slice(0, 24)? title?.slice(0, 24)+'...' : ''
+    let string = title? title : ''
+    if(string.length >= 24) { string = string.slice(0, 24)+'...' }
+
+    h1.textContent = string
+    h1.href = track.permalink_url ?? ""
     span.textContent = index + ' / ' + length
 
 }
