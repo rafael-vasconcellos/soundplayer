@@ -26,7 +26,7 @@ export default async function getTrackHLS(request: NextApiRequest, response: Nex
         const status_code = typeof result === 'string'? 200 : result
         //console.log(fileURL, status_code)
         response.setHeader('Cache-Control', 'public, max-age=15, must-revalidate')
-        response.status(status_code).send(result)
+        response.status(status_code).send( typeof result === "string"? result : "" )
         /*
         const file = await fetch(fileURL)
         .then(response => response.text()).then(res => response.send(res))
