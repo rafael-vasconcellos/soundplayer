@@ -12,22 +12,21 @@ export default async function getTrackHLS(request: NextApiRequest, response: Nex
     const url = headers?.url
     if (url) { 
 
-        const fileURL: string = await fetch(url + '?' + API_QUERY_PARAMS, { 
-            next: {
-                revalidate: 30
-            },
+        const result: string | number = await fetch(url + '?' + API_QUERY_PARAMS, { 
+            next: { revalidate: 30 },
             headers: { 'Authorization': API_KEY ?? '' }
-        } )
-        .then(response => { 
+
+        } ).then(response => { 
             if (response.status===200) { return response.json() }
-
-        }).then(res => res?.url ?? "")
+            else { return response.status }
+        }).then(res => res?.url ?? res)
         .catch(e => response.status(500).send(e))
-        const status_code = fileURL? 200 : 500
 
+
+        const status_code = typeof result === 'string'? 200 : result
         //console.log(fileURL, status_code)
         response.setHeader('Cache-Control', 'public, max-age=15, must-revalidate')
-        response.status(status_code).send(fileURL)
+        response.status(status_code).send(result)
         /*
         const file = await fetch(fileURL)
         .then(response => response.text()).then(res => response.send(res))
