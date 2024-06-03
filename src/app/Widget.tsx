@@ -25,7 +25,11 @@ const Widget: React.FC<{api: IAPI, color: string | undefined}> = function( {api,
                 <Player api={api} />
                 <p className="text-xs absolute bottom-0 w-full">
                     <a href={api?.data?.permalink_url} target="_blank">
-                        { (api?.data?.title??'') +' by '+ api?.data?.tracks[0]?.user?.username }
+                        { 
+                            (api?.data?.title ?? '') 
+                            +' by '+ 
+                            (api?.data?.user?.username ?? api?.data?.tracks[0]?.user?.username)
+                        }
                     </a>
                     <span className="px-2">{'1 / '+api?.data?.tracks?.length}</span>
                 </p>
