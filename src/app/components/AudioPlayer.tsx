@@ -1,37 +1,34 @@
 "use client"
-import { ChangeEvent, useEffect, useState } from "react";
-import { useHls, changePortrait, hydrateControls, ITrack } from "../utils";
-import { IPlayerProps } from "./Player";
+import { ChangeEvent, useEffect } from "react";
+import { useHls, changePortrait, ITrack } from "../utils";
+import { nextButton } from "./Buttons";
 
 
 
+const audioHls = useHls()
 
-export const audioHls = useHls()
-
-const AudioPlayer: React.FC<IPlayerProps> = function( {api} ) { 
-    const tracks: ITrack[] = api.data.tracks
-    const [ current_song, setCurrentSong ] = useState(0)
-
+export default function AudioPlayer( {tracks, currentSong}: {tracks: ITrack[], currentSong: number} ) { 
 
     useEffect( () => { 
-        const fetched = tracks.some(e => e.started)
         const playbutton = document.querySelector('#controls')?.children[1] as HTMLElement
 
-        playbutton.onclick = async function() { if (!fetched) { 
-            await audioHls.fetch(tracks[current_song]).then(() => playbutton.onclick = null) 
-            hydrateControls(setCurrentSong, tracks.length)
-        } }
+        playbutton.addEventListener('click', async function() { 
+            const isFetched = tracks.some(e => e.started)
+            if (!isFetched) { //console.log('dada')
+                await audioHls.fetch(tracks[currentSong]).then(() => playbutton.onclick = null)
+            }
+        } )
 
     }, [] )
 
     useEffect( () => { 
-        const fetched = tracks.some(e => e.started)
-        tracks[current_song]?.hls?.detachMedia()
-        if (fetched) { 
-            audioHls.fetch(tracks[current_song]).then(() => { audioHls.audioRef.current?.play() } )
+        const isFetched = tracks.some(e => e.started)
+        tracks[currentSong]?.hls?.detachMedia()
+        if (isFetched) { 
+            audioHls.fetch(tracks[currentSong]).then(() => { audioHls.audioRef.current?.play() } )
         } 
 
-    }, [current_song] )
+    }, [currentSong] )
 
 
 
@@ -44,20 +41,18 @@ const AudioPlayer: React.FC<IPlayerProps> = function( {api} ) {
                 if (slider) {
                     slider.value = audioHls.audioRef.current?.currentTime.toString() ?? '0'
                 }
-            } } onLoadedMetadata={ () => { console.log('loaded')
+            } } onLoadedMetadata={ () => { console.log('music loaded')
                 const slider: HTMLInputElement | null = document.querySelector('#playerRange')
                 if (!Number.isNaN(audioHls.audioRef.current?.duration)) { 
                     if (slider && audioHls.audioRef.current) { 
                         slider.max = audioHls.audioRef.current.duration.toString()
                     }
                 }
+
+                const track = tracks[currentSong]
+                changePortrait(track, currentSong+1, tracks.length)
             } } onEnded={ () => { 
-                const playerParent = document.querySelector('#playerRange')?.nextElementSibling
-                const nextbutton = playerParent?.children[2] as HTMLElement
-                nextbutton.dispatchEvent(new Event('click'))
-            } } onPlay={ () => { 
-                const track = tracks[current_song]
-                if (!audioHls.audioRef.current?.currentTime) { changePortrait(track, current_song+1, tracks.length) }
+                nextButton.current?.click()
             } }></audio>
             {/* se colocar "autoPlay" a música vai ser tocada automáticamente (sem interação) sim */}
 
@@ -74,7 +69,7 @@ const AudioPlayer: React.FC<IPlayerProps> = function( {api} ) {
 }
 
 
-export default AudioPlayer;
+
 
 /*
 

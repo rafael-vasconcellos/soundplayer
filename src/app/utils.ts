@@ -1,7 +1,6 @@
 // https://hlsjs.video-dev.org/api-docs/hls.js
 import React, { RefObject } from 'react';
 import Hls, { Events, ErrorData, ErrorController, ErrorDetails } from 'hls.js';
-import { audioHls } from './components/AudioPlayer';
 import { ICustomTrack } from './API';
 
 
@@ -20,24 +19,20 @@ type ITrackRef = {
     hls?: Hls
 }
 
-
 export type ITrack = ICustomTrack & ITrackRef
-type ICurrentSongCallback = (prevSong: number) => number
-type ISetCurrentSong = (callback: ICurrentSongCallback) => any
 
 
 
 
+
+const audioRef: IUseHls['audioRef'] = React.createRef()
 
 export function useHls(streamUrl?: string) { 
-    const audioRef: IUseHls['audioRef'] = React.createRef()
 
     const AudioHls: IUseHls = { 
         streamUrl,
         track: undefined,
-        get audioRef() { 
-            return audioRef
-        },
+        get audioRef() { return audioRef },
 
         async fetch(track: ITrack): Promise<string | undefined> { 
             this.track = track
@@ -88,16 +83,18 @@ export function useHls(streamUrl?: string) {
             function handler(event: Events.ERROR, data: ErrorData) { 
                 if ( // networkDetails
                     AudioHls.track && data.type === "networkError" 
-                    && data.details === "fragLoadError" && data.response?.code === 403
+                    && data.details === "fragLoadError" && (data.response?.code ?? 0) === 403
                 ) { 
 
                     const currentTime = hls.media?.currentTime
                     // hls.media?.currentTime, audioRef.current?.currentTime
                     hls.removeAllListeners()
-                    AudioHls.fetch(AudioHls.track).then(url => { if (url && audioRef.current && currentTime) { 
-                        audioRef.current.currentTime = currentTime
-                        audioRef.current.play()
-                    } } )
+                    AudioHls.fetch(AudioHls.track).then(url => { 
+                        if (url && audioRef.current && currentTime) { 
+                            audioRef.current.currentTime = currentTime
+                            audioRef.current.play()
+                        } 
+                    } )
                 }
             }
 
@@ -120,7 +117,7 @@ export function changePortrait(track: ICustomTrack, index: number, length: numbe
     const h1 = document.querySelector('main a#title') as HTMLAnchorElement
     const span = document.querySelector('p > span') as HTMLElement
 
-    if (artwork) { img.src = artwork }
+    if (artwork) { img.src = artwork } else { console.log(track) }
     let string = title? title : ''
     if(string.length >= 24) { string = string.slice(0, 24)+'...' }
 
@@ -131,68 +128,4 @@ export function changePortrait(track: ICustomTrack, index: number, length: numbe
 }
 
 
-export function hydrateControls(setCurrentSong: ISetCurrentSong, length: number) {
-    const playerParent = document.querySelector('#controls')
-    const playbutton = playerParent?.children[1] as HTMLElement
-    const prevbutton = playerParent?.children[0] as HTMLElement
-    const nextbutton = playerParent?.children[2] as HTMLElement
 
-
-    nextbutton.addEventListener('click',  function() { 
-        setCurrentSong((prevSong) => { 
-            if (prevSong >= length-1) { return 0 }
-            else { return prevSong += 1 }
-        } )
-    } )
-
-    prevbutton.addEventListener('click',  function() { 
-        setCurrentSong((prevSong) => {
-            if (prevSong === 0) { return length-1 }
-            else { return prevSong -= 1 }
-        } )
-    } )
-
-    playbutton.addEventListener('click', play_handler)
-
-    function play_handler() {
-        if (audioHls.audioRef.current?.paused) { audioHls.audioRef.current?.play() } 
-        else { audioHls.audioRef.current?.pause() }
-        playbutton?.children[0]?.classList.toggle('hidden')
-        playbutton?.children[1]?.classList.toggle('hidden')
-    }
-
-    play_handler()
-
-}
-
-
-
-
-
-
-
-
-/*
-
-function start(track: ITrack, audioHls: IUseHls): Promise<string | undefined> { return new Promise( (resolve) => {
-        if (!track.hls && track.media?.transcodings[0]?.url) { 
-            track.started = true
-            fetch('/api/track/hls', { headers: {
-                "url": track.media?.transcodings[0]?.url
-            } } )
-            .then(response => response.text()).then(url => { 
-                const hls = audioHls.update(url)
-                //track.hls = { ...hls } // essa linha comentada desativa o cache hls, caso não se mostrar viável
-                resolve(url)
-            } );
-
-        } else if (track.hls && audioHls.audioRef.current) { 
-            track.hls.attachMedia(audioHls.audioRef.current)
-            resolve(audioHls.url)
-        }
-
-
-    } ) }
-
-
-*/

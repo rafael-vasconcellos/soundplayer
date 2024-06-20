@@ -52,11 +52,11 @@ async function getTracks(ids: string) {
 }
 
   
-function get_object(html: string, name: keyof typeof hydratables) { 
+function get_object(html: string, name: keyof typeof hydratables) { //console.log(name)
 
     if (!html || !name) { throw new Error("Invalid input string!") }
     const start = html.indexOf(hydratables[name])
-    if (start === -1) {return null}
+    if (start === -1) { return null }
     let end = null
     let count = null
     for (let i=start ; i<html.length ; i++) {
@@ -106,10 +106,11 @@ export default async function Home( { searchParams }: IPageProps ) {
                     }
                 }
             } 
+
             else { throw new Error(`Failed to parse: ${str}`) }
     } )
     .catch(e => {error = e.message})
-    console.log(JSON.stringify(page))
+    //console.log(JSON.stringify(page))
 
 
     // no objeto da playlist, as vezes algumas faixas tem um objeto praticamente vazio (remanescentes)
